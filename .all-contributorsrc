@@ -1,0 +1,12 @@
+{
+  "projectName": "cjh-scripts",
+  "projectOwner": "chengjianhua",
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+  ],
+  "repoType": "github"
+}
