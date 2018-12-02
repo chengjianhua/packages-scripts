@@ -9,14 +9,19 @@ const {
   fromRoot,
   getConcurrentlyArgs,
   writeExtraEntry,
+  parseEnv,
 } = require('../../utils')
+
+const buildNode = parseEnv('BUILD_NODE', false)
+const buildReactNative = parseEnv('BUILD_REACT_NATIVE', false)
 
 const crossEnv = resolveBin('cross-env')
 const rollup = resolveBin('rollup')
 const args = process.argv.slice(2)
+const parsedArgs = yargsParser(args)
+
 const here = p => path.join(__dirname, p)
 const hereRelative = p => here(p).replace(process.cwd(), '.')
-const parsedArgs = yargsParser(args)
 
 const useBuiltinConfig =
   !args.includes('--config') && !hasFile('rollup.config.js')
@@ -102,8 +107,8 @@ function getCommands({preact = false} = {}) {
         `NODE_ENV=${nodeEnv}`,
         `BUILD_PREACT=${preact}`,
         `BUILD_SIZE_SNAPSHOT=${sizeSnapshot}`,
-        `BUILD_NODE=${process.env.BUILD_NODE || false}`,
-        `BUILD_REACT_NATIVE=${process.env.BUILD_REACT_NATIVE || false}`,
+        `BUILD_NODE=${buildNode}`,
+        `BUILD_REACT_NATIVE=${buildReactNative}`,
       ].join(' '),
       sourceMap,
     )

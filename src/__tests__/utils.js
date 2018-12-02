@@ -23,17 +23,17 @@ test('appDirectory is the dirname to the package.json', () => {
   expect(require('../utils').appDirectory).toBe(pkgPath)
 })
 
-test('resolveKcdScripts resolves to src/index.js when in the cjh-scripts package', () => {
+test('resolveScripts resolves to src/index.js when in the cjh-scripts package', () => {
   mockPkg({pkg: {name: 'cjh-scripts'}})
-  expect(require('../utils').resolveKcdScripts()).toBe(
+  expect(require('../utils').resolveScripts()).toBe(
     require.resolve('../').replace(process.cwd(), '.'),
   )
 })
 
-test('resolveKcdScripts resolves to cjh-scripts if not in the cjh-scripts package', () => {
+test('resolveScripts resolves to cjh-scripts if not in the cjh-scripts package', () => {
   mockPkg({pkg: {name: 'not-cjh-scripts'}})
   whichSyncMock.mockImplementationOnce(() => require.resolve('../'))
-  expect(require('../utils').resolveKcdScripts()).toBe('cjh-scripts')
+  expect(require('../utils').resolveScripts()).toBe('cjh-scripts')
 })
 
 test(`resolveBin resolves to the full path when it's not in $PATH`, () => {

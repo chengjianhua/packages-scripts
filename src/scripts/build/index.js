@@ -5,5 +5,5 @@ if (process.argv.includes('--browser')) {
 if (process.argv.includes('--bundle') || process.argv.includes('--browser')) {
   require('./rollup')
 } else {
-  require('./babel')
+  require('./babel')()
 }

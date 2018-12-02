@@ -7,16 +7,18 @@ const has = require('lodash.has')
 const readPkgUp = require('read-pkg-up')
 const which = require('which')
 
+const scriptsPackage = require('../package.json')
+
 const {pkg, path: pkgPath} = readPkgUp.sync({
   cwd: fs.realpathSync(process.cwd()),
 })
 const appDirectory = path.dirname(pkgPath)
 
-function resolveKcdScripts() {
-  if (pkg.name === 'cjh-scripts') {
+function resolveScripts() {
+  if (pkg.name === scriptsPackage.name) {
     return require.resolve('./').replace(process.cwd(), '.')
   }
-  return resolveBin('cjh-scripts')
+  return resolveBin(scriptsPackage.name)
 }
 
 // eslint-disable-next-line complexity
@@ -186,7 +188,7 @@ module.exports = {
   parseEnv,
   pkg,
   resolveBin,
-  resolveKcdScripts,
+  resolveScripts,
   uniq,
   writeExtraEntry,
 }
