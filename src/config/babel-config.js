@@ -1,5 +1,7 @@
+const path = require('path')
 const browserslist = require('browserslist')
 const semver = require('semver')
+const babel = require('@babel/core')
 
 const {ifAnyDep, parseEnv, appDirectory, pkg} = require('../utils')
 
@@ -32,29 +34,45 @@ if (!treeshake && !hasBabelRuntimeDep) {
   console.warn(RUNTIME_HELPERS_WARN)
 }
 
-module.exports = () => ({
-  presets: getPresets(),
-  plugins: [
-    [
-      require.resolve('@babel/plugin-transform-runtime'),
-      {useESModules: treeshake && !isCJS},
-    ],
-    require.resolve('babel-plugin-macros'),
-    getAliasPlugin(),
-    [
-      require.resolve('babel-plugin-transform-react-remove-prop-types'),
-      isPreact ? {removeImport: true} : {mode: 'unsafe-wrap'},
-    ],
-    isUMD
-      ? require.resolve('babel-plugin-transform-inline-environment-variables')
-      : null,
-    [require.resolve('@babel/plugin-proposal-class-properties'), {loose: true}],
-    require.resolve('babel-plugin-minify-dead-code-elimination'),
-    treeshake
-      ? null
-      : require.resolve('@babel/plugin-transform-modules-commonjs'),
-  ].filter(Boolean),
-})
+module.exports = loadBabelConfig()
+
+function loadBabelConfig() {
+  return api => {
+    api.cache.never()
+
+    return {
+      // ...(extendConfigs.length > 0 && {
+      //   extends: extendConfigs,
+      // }),
+      presets: getPresets(),
+      plugins: [
+        [
+          require.resolve('@babel/plugin-transform-runtime'),
+          {useESModules: treeshake && !isCJS},
+        ],
+        require.resolve('babel-plugin-macros'),
+        getAliasPlugin(),
+        [
+          require.resolve('babel-plugin-transform-react-remove-prop-types'),
+          isPreact ? {removeImport: true} : {mode: 'unsafe-wrap'},
+        ],
+        isUMD
+          ? require.resolve(
+              'babel-plugin-transform-inline-environment-variables',
+            )
+          : null,
+        [
+          require.resolve('@babel/plugin-proposal-class-properties'),
+          {loose: true},
+        ],
+        require.resolve('babel-plugin-minify-dead-code-elimination'),
+        treeshake
+          ? null
+          : require.resolve('@babel/plugin-transform-modules-commonjs'),
+      ].filter(Boolean),
+    }
+  }
+}
 
 function getNodeVersion({engines: {node: nodeVersion = '8'} = {}}) {
   const oldestVersion = semver

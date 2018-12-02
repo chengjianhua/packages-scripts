@@ -7,7 +7,7 @@ const has = require('lodash.has')
 const readPkgUp = require('read-pkg-up')
 const which = require('which')
 
-const scriptsPackage = require('../package.json')
+const scriptsPackage = require('../../package.json')
 
 const {pkg, path: pkgPath} = readPkgUp.sync({
   cwd: fs.realpathSync(process.cwd()),

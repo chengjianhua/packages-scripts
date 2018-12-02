@@ -110,6 +110,7 @@
   },
   "homepage": "https://github.com/chengjianhua/cjh-scripts#readme",
   "devDependencies": {
+    "@types/babel__core": "^7.0.4",
     "jest-in-case": "^1.0.2",
     "slash": "^2.0.0"
   }
