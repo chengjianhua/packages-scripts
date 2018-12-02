@@ -1,22 +1,20 @@
-const path = require('path')
+// const path = require('path')
 const spawn = require('cross-spawn')
 const rimraf = require('rimraf')
 // const babel = require('@babel/core')
 
-const {hasPkgProp, fromRoot, resolveBin, hasFile} = require('../../utils')
+const {
+  fromRoot,
+  resolveBin,
+  getBuiltInBabelPreset,
+  isUsingBuiltInBabelConfig,
+} = require('../../utils')
 
 module.exports = function build() {
   // TODO: is still valid while running this like `NODE_ENV=production node -r ./node_modules/.bin/ckh-scripts` ?
   const args = process.argv.slice(2)
 
-  const here = p => path.join(__dirname, p)
-
-  const useBuiltinConfig =
-    !args.includes('--presets') &&
-    !hasFile('.babelrc') &&
-    !hasFile('.babelrc.js') &&
-    !hasFile('babel.config.js') &&
-    !hasPkgProp('babel')
+  const useBuiltinConfig = isUsingBuiltInBabelConfig()
 
   const useSpecifiedOutDir = args.includes('--out-dir')
 
@@ -37,7 +35,7 @@ module.exports = function build() {
   }
 
   if (useBuiltinConfig) {
-    args.push('--presets', here('../../config/babelrc.js'))
+    args.push('--presets', getBuiltInBabelPreset())
   }
 
   const result = spawn.sync(

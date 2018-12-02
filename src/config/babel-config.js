@@ -1,7 +1,5 @@
-const path = require('path')
 const browserslist = require('browserslist')
 const semver = require('semver')
-const babel = require('@babel/core')
 
 const {ifAnyDep, parseEnv, appDirectory, pkg} = require('../utils')
 

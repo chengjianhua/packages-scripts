@@ -9,6 +9,12 @@ const which = require('which')
 
 const scriptsPackage = require('../../package.json')
 
+const {
+  loadBabelConfig,
+  getBuiltInBabelPreset,
+  isUsingBuiltInBabelConfig,
+} = require('./babel')
+
 const {pkg, path: pkgPath} = readPkgUp.sync({
   cwd: fs.realpathSync(process.cwd()),
 })
@@ -16,7 +22,7 @@ const appDirectory = path.dirname(pkgPath)
 
 function resolveScripts() {
   if (pkg.name === scriptsPackage.name) {
-    return require.resolve('./').replace(process.cwd(), '.')
+    return require.resolve('../').replace(process.cwd(), '.')
   }
   return resolveBin(scriptsPackage.name)
 }
@@ -191,4 +197,7 @@ module.exports = {
   resolveScripts,
   uniq,
   writeExtraEntry,
+  loadBabelConfig,
+  getBuiltInBabelPreset,
+  isUsingBuiltInBabelConfig,
 }
