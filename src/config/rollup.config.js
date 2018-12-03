@@ -13,16 +13,15 @@ const {sizeSnapshot} = require('rollup-plugin-size-snapshot')
 const omit = require('lodash.omit')
 const {
   pkg,
-  hasFile,
-  hasPkgProp,
   parseEnv,
   ifFile,
   fromRoot,
   uniq,
   writeExtraEntry,
+  isUsingBuiltInBabelConfig,
+  getBuiltInBabelPreset,
 } = require('../utils')
 
-const here = p => path.join(__dirname, p)
 const capitalize = s => s[0].toUpperCase() + s.slice(1)
 
 const minify = parseEnv('BUILD_MINIFY', false)
@@ -115,12 +114,8 @@ const output = [
   },
 ]
 
-const useBuiltinConfig =
-  !hasFile('.babelrc') &&
-  !hasFile('.babelrc.js') &&
-  !hasFile('babel.config.js') &&
-  !hasPkgProp('babel')
-const babelPresets = useBuiltinConfig ? [here('../config/babelrc.js')] : []
+const useBuiltinConfig = isUsingBuiltInBabelConfig()
+const babelPresets = useBuiltinConfig ? getBuiltInBabelPreset() : []
 
 const replacements = Object.entries(
   umd ? process.env : omit(process.env, ['NODE_ENV']),

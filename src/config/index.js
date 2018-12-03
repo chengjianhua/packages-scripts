@@ -1,5 +1,5 @@
 module.exports = {
-  babel: require('./babelrc'),
+  babel: require('./babel-config'),
   eslint: require('./eslintrc'),
   jest: require('./jest.config'),
   lintStaged: require('./lintstagedrc'),

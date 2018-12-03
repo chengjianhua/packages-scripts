@@ -1,6 +1,6 @@
 test('requiring some files does not blow up', () => {
   require('../babel-transform')
-  require('../babelrc')
+  require('../babel-config')
   require('../eslintrc')
   require('../jest.config')
   require('../lintstagedrc')
