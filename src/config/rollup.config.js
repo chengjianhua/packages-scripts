@@ -114,8 +114,8 @@ const output = [
   },
 ]
 
-const useBuiltinConfig = isUsingBuiltInBabelConfig()
-const babelPresets = useBuiltinConfig ? getBuiltInBabelPreset() : []
+const useBuiltinBabelConfig = isUsingBuiltInBabelConfig()
+const babelPresets = useBuiltinBabelConfig ? getBuiltInBabelPreset() : []
 
 const replacements = Object.entries(
   umd ? process.env : omit(process.env, ['NODE_ENV']),
@@ -143,8 +143,8 @@ module.exports = {
     json(),
     rollupBabel({
       presets: babelPresets,
-      babelrc: !useBuiltinConfig,
-      runtimeHelpers: useBuiltinConfig,
+      babelrc: !useBuiltinBabelConfig,
+      runtimeHelpers: useBuiltinBabelConfig,
     }),
     replace(replacements),
     useSizeSnapshot ? sizeSnapshot({printInfo: false}) : null,

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+
 let shouldThrow
 try {
   shouldThrow =

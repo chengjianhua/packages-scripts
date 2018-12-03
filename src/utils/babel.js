@@ -1,5 +1,6 @@
 const path = require('path')
 const babel = require('@babel/core')
+const debug = require('debug')('cjh-scripts:utils:babel')
 
 const here = p => path.resolve(__dirname, p)
 
@@ -12,25 +13,29 @@ function loadBabelConfig() {
       filename: path.join(process.cwd(), 'src'),
     })
   } catch (error) {
-    // console.error(error)
-    return null
+    if (error.code === 'BABEL_ROOT_NOT_FOUND') {
+      debug('Not found root `babel.config.js` file.')
+      return null
+    }
+
+    throw error
   }
 
   const extendConfigs = []
 
   if (loadedBabelConfig.config) {
-    console.log(
-      `Found project-wide configuration file: ${loadedBabelConfig.config}`,
-    )
+    debug(`Found project-wide configuration file: ${loadedBabelConfig.config}`)
     extendConfigs.push(loadedBabelConfig.config)
   }
 
   if (loadedBabelConfig.babelrc) {
-    console.log(
+    debug(
       `Found sub-package-wide configuration file: ${loadedBabelConfig.babelrc}`,
     )
     extendConfigs.push(loadedBabelConfig.babelrc)
   }
+
+  debug(require('util').inspect(loadedBabelConfig, {colors: true, depth: 5}))
 
   // return loadedBabelConfig
 
@@ -41,7 +46,7 @@ function loadBabelConfig() {
   //   return loadedBabelConfig.options
   // }
 
-  if (!loadedBabelConfig.babelrc || !loadedBabelConfig.config) {
+  if (!loadedBabelConfig.babelrc && !loadedBabelConfig.config) {
     return null
   }
 

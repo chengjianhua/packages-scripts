@@ -43,13 +43,6 @@ if (typeof parsedArgs.bundle === 'string') {
   formats = parsedArgs.bundle.split(',')
 }
 
-const defaultEnv = 'BUILD_ROLLUP=true'
-
-const getCommand = (env, ...flags) =>
-  [crossEnv, defaultEnv, env, rollup, config, environment, watch, ...flags]
-    .filter(Boolean)
-    .join(' ')
-
 const buildPreact = args.includes('--p-react')
 const scripts = buildPreact
   ? getPReactScripts()
@@ -114,6 +107,21 @@ function getCommands({preact = false} = {}) {
     )
     return cmds
   }, {})
+}
+
+function getCommand(env, ...flags) {
+  return [
+    crossEnv,
+    'BUILD_ROLLUP=true',
+    env,
+    rollup,
+    config,
+    environment,
+    watch,
+    ...flags,
+  ]
+    .filter(Boolean)
+    .join(' ')
 }
 
 process.exit(result.status)

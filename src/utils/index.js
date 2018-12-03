@@ -6,6 +6,7 @@ const arrify = require('arrify')
 const has = require('lodash.has')
 const readPkgUp = require('read-pkg-up')
 const which = require('which')
+const spawn = require('cross-spawn')
 
 const scriptsPackage = require('../../package.json')
 
@@ -132,6 +133,12 @@ function getConcurrentlyArgs(scripts, {killOthers = true} = {}) {
   ].filter(Boolean)
 }
 
+function execScriptsConcurrently(scripts) {
+  return spawn.sync(resolveBin('concurrently'), scripts, {
+    stdio: 'inherit',
+  })
+}
+
 function isOptedOut(key, t = true, f = false) {
   if (!fs.existsSync(fromRoot('.opt-out'))) {
     return f
@@ -200,4 +207,5 @@ module.exports = {
   loadBabelConfig,
   getBuiltInBabelPreset,
   isUsingBuiltInBabelConfig,
+  execScriptsConcurrently,
 }
