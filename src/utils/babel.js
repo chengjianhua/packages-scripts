@@ -1,6 +1,6 @@
 const path = require('path')
 const babel = require('@babel/core')
-const debug = require('debug')('cjh-scripts:utils:babel')
+const debug = require('debug')('packages-scripts:utils:babel')
 
 const here = p => path.resolve(__dirname, p)
 

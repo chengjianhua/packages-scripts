@@ -1,6 +1,6 @@
 const spawn = require('cross-spawn')
 const rimraf = require('rimraf')
-const debug = require('debug')('cjh-scripts:scripts:build:babel')
+const debug = require('debug')('packages-scripts:scripts:build:babel')
 
 const {
   fromRoot,

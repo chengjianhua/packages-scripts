@@ -3,7 +3,7 @@
 let shouldThrow
 try {
   shouldThrow =
-    require(`${process.cwd()}/package.json`).name === 'cjh-scripts' &&
+    require(`${process.cwd()}/package.json`).name === 'packages-scripts' &&
     Number(process.version.slice(1).split('.')[0]) < 8
 } catch (error) {
   // ignore
@@ -11,7 +11,7 @@ try {
 
 if (shouldThrow) {
   throw new Error(
-    'You must use Node version 8 or greater to run the scripts within cjh-scripts ' +
+    'You must use Node version 8 or greater to run the scripts within packages-scripts ' +
       'because we dogfood the untranspiled version of the scripts.',
   )
 }

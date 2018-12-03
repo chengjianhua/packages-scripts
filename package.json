@@ -1,5 +1,5 @@
 {
-  "name": "cjh-scripts",
+  "name": "packages-scripts",
   "version": "0.0.0-semantically-released",
   "description": "CLI for common scripts for my projects",
   "engines": {
@@ -7,7 +7,7 @@
     "npm": ">= 5"
   },
   "bin": {
-    "cjh-scripts": "dist/index.js"
+    "packages-scripts": "dist/index.js"
   },
   "scripts": {
     "add-contributor": "node src contributors add",
@@ -105,12 +105,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/chengjianhua/cjh-scripts.git"
+    "url": "https://github.com/chengjianhua/packages-scripts.git"
   },
   "bugs": {
-    "url": "https://github.com/chengjianhua/cjh-scripts/issues"
+    "url": "https://github.com/chengjianhua/packages-scripts/issues"
   },
-  "homepage": "https://github.com/chengjianhua/cjh-scripts#readme",
+  "homepage": "https://github.com/chengjianhua/packages-scripts#readme",
   "devDependencies": {
     "@types/babel__core": "^7.0.4",
     "jest-in-case": "^1.0.2",
