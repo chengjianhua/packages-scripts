@@ -118,12 +118,14 @@ function getPresets() {
 
 function getAliasPlugin() {
   const mergedAlias = {
-    '@': './',
+    '@': './src',
     ...buildAlias,
   }
 
   return [
     require.resolve('babel-plugin-module-resolver'),
-    {root: ['./src'], mergedAlias},
+    {
+      alias: mergedAlias,
+    },
   ]
 }

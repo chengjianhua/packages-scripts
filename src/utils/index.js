@@ -14,6 +14,8 @@ const {
   loadBabelConfig,
   getBuiltInBabelPreset,
   isUsingBuiltInBabelConfig,
+  getGeneralBabelPluginsUsed,
+  isBabelPluginUsed,
 } = require('./babel')
 
 const {pkg, path: pkgPath} = readPkgUp.sync({
@@ -208,4 +210,6 @@ module.exports = {
   getBuiltInBabelPreset,
   isUsingBuiltInBabelConfig,
   execScriptsConcurrently,
+  getGeneralBabelPluginsUsed,
+  isBabelPluginUsed,
 }

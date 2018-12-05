@@ -63,6 +63,26 @@ function getBuiltInBabelPreset() {
   return babelPresets
 }
 
+function getGeneralPluginsUsed() {
+  const config = loadBabelConfig()
+
+  if (!config) return null
+
+  return config.options.plugins
+}
+
+function isPluginUsed(pluginName) {
+  const usedPlugins = getGeneralPluginsUsed()
+
+  if (!usedPlugins) return false
+
+  return usedPlugins.some(
+    p => (p.file ? p.file.resolved.indexOf(pluginName) !== -1 : false),
+  )
+}
+
 exports.loadBabelConfig = loadBabelConfig
 exports.getBuiltInBabelPreset = getBuiltInBabelPreset
 exports.isUsingBuiltInBabelConfig = isUsingBuiltInBabelConfig
+exports.getGeneralBabelPluginsUsed = getGeneralPluginsUsed
+exports.isBabelPluginUsed = isPluginUsed

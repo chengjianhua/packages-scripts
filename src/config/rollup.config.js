@@ -11,6 +11,7 @@ const nodeBuiltIns = require('rollup-plugin-node-builtins')
 const nodeGlobals = require('rollup-plugin-node-globals')
 const {sizeSnapshot} = require('rollup-plugin-size-snapshot')
 const omit = require('lodash.omit')
+
 const {
   pkg,
   parseEnv,
@@ -20,15 +21,17 @@ const {
   writeExtraEntry,
   isUsingBuiltInBabelConfig,
   getBuiltInBabelPreset,
+  isBabelPluginUsed,
 } = require('../utils')
 
 const capitalize = s => s[0].toUpperCase() + s.slice(1)
+const pascal = n => capitalize(camelcase(n))
 
 const minify = parseEnv('BUILD_MINIFY', false)
 const format = process.env.BUILD_FORMAT
 const isPreact = parseEnv('BUILD_PREACT', false)
 const isNode = parseEnv('BUILD_NODE', false)
-const name = process.env.BUILD_NAME || capitalize(camelcase(pkg.name))
+const name = process.env.BUILD_NAME || pascal(pkg.name)
 const useSizeSnapshot = parseEnv('BUILD_SIZE_SNAPSHOT', false)
 
 const esm = format === 'esm'
@@ -36,7 +39,7 @@ const umd = format === 'umd'
 
 const defaultGlobals = Object.keys(pkg.peerDependencies || {}).reduce(
   (deps, dep) => {
-    deps[dep] = capitalize(camelcase(dep))
+    deps[dep] = pascal(dep)
     return deps
   },
   {},
@@ -63,7 +66,7 @@ if (
   uniq(input.map(single => path.basename(single))).length !== input.length
 ) {
   throw new Error(
-    'Filenames of code-splitted entries should be unique to get deterministic output filenames.' +
+    'Filenames of code-splitting entries should be unique to get deterministic output filenames.' +
       `\nReceived those: ${input}.`,
   )
 }
@@ -136,16 +139,19 @@ module.exports = {
   experimentalCodeSplitting: codeSplitting,
   external: externalPredicate,
   plugins: [
+    rollupBabel({
+      presets: babelPresets,
+      babelrc: !useBuiltinBabelConfig,
+      rootMode: 'upward',
+      runtimeHelpers:
+        isBabelPluginUsed('@babel/plugin-transform-runtime') ||
+        isBabelPluginUsed('babel-plugin-transform-runtime'),
+    }),
     isNode ? nodeBuiltIns() : null,
     isNode ? nodeGlobals() : null,
     nodeResolve({preferBuiltins: isNode, jsnext: true, main: true}),
     commonjs({include: 'node_modules/**'}),
     json(),
-    rollupBabel({
-      presets: babelPresets,
-      babelrc: !useBuiltinBabelConfig,
-      runtimeHelpers: useBuiltinBabelConfig,
-    }),
     replace(replacements),
     useSizeSnapshot ? sizeSnapshot({printInfo: false}) : null,
     minify ? terser() : null,
