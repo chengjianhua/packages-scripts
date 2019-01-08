@@ -1,5 +1,6 @@
 const browserslist = require('browserslist')
 const semver = require('semver')
+const debug = require('debug')('packages-scripts:config:babel-config')
 
 const {ifAnyDep, parseEnv, appDirectory, pkg} = require('../utils')
 
@@ -32,10 +33,26 @@ if (!treeshake && !hasBabelRuntimeDep) {
   console.warn(RUNTIME_HELPERS_WARN)
 }
 
+debug('loaded options %O', {
+  BABEL_ENV,
+  NODE_ENV,
+  appDirectory,
+  isRollup,
+  isWebpack,
+  isBrowser,
+  treeshake,
+  buildAlias,
+  isUMD,
+  isCJS,
+  hasBabelRuntimeDep,
+})
+
 module.exports = loadBabelConfig()
 
 function loadBabelConfig() {
   return api => {
+    api.assertVersion(7)
+
     api.cache.never()
 
     return {
@@ -103,6 +120,8 @@ function getPresets() {
       ? {browsers: browsersConfig}
       : {node: getNodeVersion(pkg)}
   const envOptions = {modules: false, loose: true, targets: envTargets}
+
+  debug('set options for @babel/preset-env', envOptions)
 
   return [
     [require.resolve('@babel/preset-env'), envOptions],

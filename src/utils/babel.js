@@ -4,14 +4,23 @@ const debug = require('debug')('packages-scripts:utils:babel')
 
 const here = p => path.resolve(__dirname, p)
 
+function loadBabelOptions() {
+  try {
+    const loadedBabelOptions = babel.loadOptions(getLoadOptions())
+
+    debug('loaded options with `babel.loadOptions()` %O', loadedBabelOptions)
+    return loadedBabelOptions
+  } catch (error) {
+    debug('loaded options with `babel.loadOptions()` failed')
+    return null
+  }
+}
+
 function loadBabelConfig() {
   let loadedBabelConfig
 
   try {
-    loadedBabelConfig = babel.loadPartialConfig({
-      rootMode: 'upward',
-      filename: path.join(process.cwd(), 'src'),
-    })
+    loadedBabelConfig = babel.loadPartialConfig(getLoadOptions())
   } catch (error) {
     if (error.code === 'BABEL_ROOT_NOT_FOUND') {
       debug('Not found root `babel.config.js` file.')
@@ -20,6 +29,11 @@ function loadBabelConfig() {
 
     throw error
   }
+
+  debug(
+    'loaded babel configuration derived from user-defined babel configuration file %O',
+    loadedBabelConfig,
+  )
 
   const extendConfigs = []
 
@@ -34,8 +48,6 @@ function loadBabelConfig() {
     )
     extendConfigs.push(loadedBabelConfig.babelrc)
   }
-
-  debug(require('util').inspect(loadedBabelConfig, {colors: true, depth: 5}))
 
   // return loadedBabelConfig
 
@@ -53,6 +65,14 @@ function loadBabelConfig() {
   return loadedBabelConfig
 }
 
+function getLoadOptions() {
+  return {
+    rootMode: 'upward',
+    // FIXME: 如果不存在 src 的话应该如何处理
+    filename: path.join(process.cwd(), 'src'),
+  }
+}
+
 function isUsingBuiltInBabelConfig() {
   return !loadBabelConfig()
 }
@@ -64,11 +84,11 @@ function getBuiltInBabelPreset() {
 }
 
 function getGeneralPluginsUsed() {
-  const config = loadBabelConfig()
+  const loadedBabelOptions = loadBabelOptions()
 
-  if (!config) return null
+  if (!loadedBabelOptions) return null
 
-  return config.options.plugins
+  return loadedBabelOptions.plugins
 }
 
 function isPluginUsed(pluginName) {
@@ -76,9 +96,7 @@ function isPluginUsed(pluginName) {
 
   if (!usedPlugins) return false
 
-  return usedPlugins.some(
-    p => (p.file ? p.file.resolved.indexOf(pluginName) !== -1 : false),
-  )
+  return usedPlugins.some(p => p.key.includes(pluginName))
 }
 
 exports.loadBabelConfig = loadBabelConfig

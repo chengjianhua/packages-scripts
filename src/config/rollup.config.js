@@ -11,6 +11,7 @@ const nodeBuiltIns = require('rollup-plugin-node-builtins')
 const nodeGlobals = require('rollup-plugin-node-globals')
 const {sizeSnapshot} = require('rollup-plugin-size-snapshot')
 const omit = require('lodash.omit')
+// const debug = require('debug')('packages-scripts:config:rollup')
 
 const {
   pkg,
@@ -143,9 +144,7 @@ module.exports = {
       presets: babelPresets,
       babelrc: !useBuiltinBabelConfig,
       rootMode: 'upward',
-      runtimeHelpers:
-        isBabelPluginUsed('@babel/plugin-transform-runtime') ||
-        isBabelPluginUsed('babel-plugin-transform-runtime'),
+      runtimeHelpers: isBabelPluginUsed('transform-runtime'),
     }),
     isNode ? nodeBuiltIns() : null,
     isNode ? nodeGlobals() : null,
