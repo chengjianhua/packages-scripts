@@ -45,13 +45,14 @@ function build() {
     )
   }
 
-  debug(resolveBin('@babel/cli', {executable: 'babel'}), ['src'].concat(args))
-
-  const result = spawn.sync(
+  const babelCmd = [
     resolveBin('@babel/cli', {executable: 'babel'}),
     ['src'].concat(args),
-    {stdio: 'inherit'},
-  )
+  ]
+
+  debug('starting to execute: %s %O', ...babelCmd)
+
+  const result = spawn.sync(...babelCmd, {stdio: 'inherit'})
 
   // TODO: move the exit operation out of current file
   process.exit(result.status)
