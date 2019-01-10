@@ -68,7 +68,7 @@ function loadBabelConfig() {
 function getLoadOptions() {
   return {
     rootMode: 'upward',
-    // FIXME: 如果不存在 src 的话应该如何处理
+    // TODO: 如果不存在 src 的话应该如何处理
     filename: path.join(process.cwd(), 'src'),
   }
 }
