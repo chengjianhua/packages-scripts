@@ -145,6 +145,11 @@ function getAliasPlugin() {
     require.resolve('babel-plugin-module-resolver'),
     {
       alias: mergedAlias,
+      // https://github.com/tleunen/babel-plugin-module-resolver/blob/master/DOCS.md#cwd
+      // in monorepo, build inside sub package is fine, but run all test files
+      // of all sub packages from root directory caused the incorrect target file
+      // use closet package.json as the current directory to transform path
+      cwd: 'packagejson',
     },
   ]
 }
