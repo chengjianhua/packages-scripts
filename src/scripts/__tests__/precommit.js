@@ -23,13 +23,13 @@ cases(
     })
     process.exit = jest.fn()
 
-    process.argv = ['node', '../precommit', ...args]
+    process.argv = ['node', '../../index.js', 'precommit', ...args]
     utils.isOptedIn = optIn => optIn === 'pre-commit'
     crossSpawnSyncMock.mockClear()
 
     try {
       // tests
-      require('../precommit')
+      require('../../')
       expect(crossSpawnSyncMock).toHaveBeenCalledTimes(2)
       const [firstCall, secondCall] = crossSpawnSyncMock.mock.calls
       const [scriptOne, calledArgsOne] = firstCall

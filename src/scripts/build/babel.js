@@ -1,26 +1,29 @@
 const spawn = require('cross-spawn')
-const rimraf = require('rimraf')
 const debug = require('debug')('packages-scripts:scripts:build:babel')
 
 const {
-  fromRoot,
   resolveBin,
   getBuiltInBabelPreset,
   loadBabelConfig,
 } = require('../../utils')
+const {defaultSourceRoot} = require('../../options')
 
-function build() {
-  // TODO: is still valid while running this like `NODE_ENV=production node -r ./node_modules/.bin/ckh-scripts` ?
-  const args = process.argv.slice(2)
+module.exports = function compile({outDir, deleteDirOnStart, input, args}) {
+  args = [...args]
+  input = [...input]
+  if (!input.length) {
+    input.unshift(defaultSourceRoot)
+  }
 
   const loadedBabelConfig = loadBabelConfig()
   const useBuiltinConfig = !loadedBabelConfig
+  // const fullOutputDir = path.join(defaultBuildRoot, outDir)
+  const fullOutputDir = outDir
 
-  const useSpecifiedOutDir = args.includes('--out-dir') || args.includes('-d')
+  args.splice(args.indexOf('--out-dir'), 2)
 
-  if (!useSpecifiedOutDir) {
-    args.unshift('--out-dir', 'dist')
-  }
+  // push to tail to override `--out-dir` in `args` array
+  args.push('--out-dir', fullOutputDir)
 
   if (!args.includes('--ignore')) {
     args.push('--ignore', '**/__tests__/**/*,**/__mocks__/**/*')
@@ -30,10 +33,8 @@ function build() {
     args.push('--copy-files')
   }
 
-  if (!useSpecifiedOutDir && !args.includes('--no-clean')) {
-    // TODO: change to that if there is no `--no-clean` option specified, clean
-    // the out dir which user specified
-    rimraf.sync(fromRoot('dist'))
+  if (deleteDirOnStart) {
+    args.push('--delete-dir-on-start')
   }
 
   if (useBuiltinConfig) {
@@ -45,19 +46,22 @@ function build() {
     )
   }
 
+  input.forEach(filename => {
+    const foundIndex = args.indexOf(filename)
+
+    if (foundIndex !== -1) {
+      args.splice(foundIndex, 1)
+    }
+  })
+
   const babelCmd = [
     resolveBin('@babel/cli', {executable: 'babel'}),
-    ['src'].concat(args),
+    input.concat(args),
   ]
 
-  debug('starting to execute: %s %O', ...babelCmd)
+  debug('starting to execute %o ...', babelCmd)
 
   const result = spawn.sync(...babelCmd, {stdio: 'inherit'})
 
-  // TODO: move the exit operation out of current file
-  process.exit(result.status)
-
   return result
 }
-
-build()

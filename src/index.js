@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+const path = require('path')
+const yargs = require('yargs')
+const debug = require('debug')('packages-scripts')
 
 let shouldThrow
 try {
@@ -16,4 +19,13 @@ if (shouldThrow) {
   )
 }
 
-require('./run-script')
+// require('./run-script')
+
+// TODO: after development, put this to bin directory, not src/index.js
+const argv = yargs
+  .scriptName('packages-scripts')
+  .commandDir(path.resolve(__dirname, './cmds'))
+  .help()
+  .demandCommand().argv
+
+debug('argv: %o', argv)

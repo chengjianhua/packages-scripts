@@ -11,6 +11,7 @@ cases(
   'lint',
   ({
     args = [],
+    input = [],
     utils = require('../../utils'),
     hasPkgProp = () => false,
     hasFile = () => false,
@@ -33,7 +34,7 @@ cases(
 
     try {
       // tests
-      require('../lint')
+      require('../lint')({args, input})
       expect(crossSpawnSyncMock).toHaveBeenCalledTimes(1)
       const [firstCall] = crossSpawnSyncMock.mock.calls
       const [script, calledArgs] = firstCall
@@ -76,6 +77,12 @@ cases(
     },
     'runs on given files, but only js files': {
       args: [
+        './src/index.js',
+        './package.json',
+        './src/index.css',
+        './src/component.js',
+      ],
+      input: [
         './src/index.js',
         './package.json',
         './src/index.css',

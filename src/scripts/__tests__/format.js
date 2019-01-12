@@ -16,9 +16,9 @@ cases(
     process.exit = jest.fn()
 
     // tests
-    process.argv = ['node', '../format', ...args]
+    process.argv = ['node', '../../index.js', 'format', ...args]
     crossSpawnSyncMock.mockClear()
-    require('../format')
+    require('../..')
     expect(crossSpawnSyncMock).toHaveBeenCalledTimes(1)
     const [firstCall] = crossSpawnSyncMock.mock.calls
     const [script, calledArgs] = firstCall

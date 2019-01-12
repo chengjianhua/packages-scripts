@@ -2,13 +2,15 @@ const path = require('path')
 const babel = require('@babel/core')
 const debug = require('debug')('packages-scripts:utils:babel')
 
+const {defaultSourceRoot} = require('../options')
+
 const here = p => path.resolve(__dirname, p)
 
 function loadBabelOptions() {
   try {
     const loadedBabelOptions = babel.loadOptions(getLoadOptions())
 
-    debug('loaded options with `babel.loadOptions()` %O', loadedBabelOptions)
+    debug('loaded options with `babel.loadOptions()` %o', loadedBabelOptions)
     return loadedBabelOptions
   } catch (error) {
     debug('loaded options with `babel.loadOptions()` failed')
@@ -31,7 +33,7 @@ function loadBabelConfig() {
   }
 
   debug(
-    'loaded babel configuration derived from user-defined babel configuration file %O',
+    'loaded babel configuration derived from user-defined babel configuration file %o',
     loadedBabelConfig,
   )
 
@@ -69,7 +71,7 @@ function getLoadOptions() {
   return {
     rootMode: 'upward',
     // TODO: 如果不存在 src 的话应该如何处理
-    filename: path.join(process.cwd(), 'src'),
+    filename: path.join(process.cwd(), defaultSourceRoot),
   }
 }
 
@@ -78,9 +80,7 @@ function isUsingBuiltInBabelConfig() {
 }
 
 function getBuiltInBabelPreset() {
-  const babelPresets = [here('../config/babel-config.js')]
-
-  return babelPresets
+  return here('../config/babel-config.js')
 }
 
 function getGeneralPluginsUsed() {

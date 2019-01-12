@@ -14,8 +14,8 @@ afterEach(() => {
 })
 
 test('calls all-contributors CLI with args', () => {
-  process.argv = ['node', '../contributors', 'add']
-  require('../contributors')
+  process.argv = ['node', '../..', 'contributors', 'add']
+  require('../..')
   expect(crossSpawnSyncMock).toHaveBeenCalledTimes(1)
   expect(crossSpawnSyncMock).toHaveBeenCalledWith(
     expect.stringMatching('all-contributors'),

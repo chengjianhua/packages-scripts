@@ -11,6 +11,8 @@ const nodeBuiltIns = require('rollup-plugin-node-builtins')
 const nodeGlobals = require('rollup-plugin-node-globals')
 const {sizeSnapshot} = require('rollup-plugin-size-snapshot')
 const omit = require('lodash.omit')
+
+const {defaultBuildRoot, defaultSourceRoot} = require('../options')
 // const debug = require('debug')('packages-scripts:config:rollup')
 
 const {
@@ -54,9 +56,9 @@ const input = glob.sync(
   fromRoot(
     process.env.BUILD_INPUT ||
       ifFile(
-        `src/${format}-entry.js`,
-        `src/${format}-entry.js`,
-        'src/index.js',
+        `${defaultSourceRoot}/${format}-entry.js`,
+        `${defaultSourceRoot}/${format}-entry.js`,
+        `${defaultSourceRoot}/index.js`,
       ),
   ),
 )
@@ -95,7 +97,8 @@ const externalPredicate =
   external.length === 0 ? () => false : id => externalPattern.test(id)
 
 const filename = [
-  pkg.name,
+  // remove scope name prefix `@xxx/` out from the filename
+  pkg.name.replace(/^@.*\/(.*)/, '$1'),
   filenameSuffix,
   `.${format}`,
   minify ? '.min' : null,
@@ -104,7 +107,9 @@ const filename = [
   .filter(Boolean)
   .join('')
 
-const dirpath = path.join(...[filenamePrefix, 'dist'].filter(Boolean))
+// put all bundles in a directory, make cleaning the output directory less
+// ambitiously before bundling multiple bundle files
+const dirpath = path.join(...[defaultBuildRoot, filenamePrefix].filter(Boolean))
 
 const output = [
   {
@@ -119,7 +124,6 @@ const output = [
 ]
 
 const useBuiltinBabelConfig = isUsingBuiltInBabelConfig()
-const babelPresets = useBuiltinBabelConfig ? getBuiltInBabelPreset() : []
 
 const replacements = Object.entries(
   umd ? process.env : omit(process.env, ['NODE_ENV']),
@@ -141,7 +145,9 @@ module.exports = {
   external: externalPredicate,
   plugins: [
     rollupBabel({
-      presets: babelPresets,
+      ...(useBuiltinBabelConfig && {
+        presets: [getBuiltInBabelPreset()],
+      }),
       babelrc: !useBuiltinBabelConfig,
       rootMode: 'upward',
       runtimeHelpers: isBabelPluginUsed('transform-runtime'),

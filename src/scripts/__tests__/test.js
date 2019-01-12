@@ -39,7 +39,7 @@ cases(
 
     try {
       // tests
-      require('../test')
+      require('../test')({args})
       expect(jestRunMock).toHaveBeenCalledTimes(1)
       const [firstCall] = jestRunMock.mock.calls
       const [jestArgs] = firstCall

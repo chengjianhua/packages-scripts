@@ -33,7 +33,7 @@ if (!treeshake && !hasBabelRuntimeDep) {
   console.warn(RUNTIME_HELPERS_WARN)
 }
 
-debug('loaded options for generating babel configuration %O', {
+debug('loaded options for generating babel configuration %o', {
   BABEL_ENV,
   NODE_ENV,
   appDirectory,
@@ -121,7 +121,7 @@ function getPresets() {
       : {node: getNodeVersion(pkg)}
   const envOptions = {modules: false, loose: true, targets: envTargets}
 
-  debug('set options for `@babel/preset-env`', envOptions)
+  debug('set options for `@babel/preset-env` %o', envOptions)
 
   return [
     [require.resolve('@babel/preset-env'), envOptions],

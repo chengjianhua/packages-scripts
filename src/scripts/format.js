@@ -1,44 +1,53 @@
 const path = require('path')
+const chalk = require('chalk')
 const spawn = require('cross-spawn')
-const yargsParser = require('yargs-parser')
+
 const {hasPkgProp, resolveBin, hasFile} = require('../utils')
 
-const args = process.argv.slice(2)
-const parsedArgs = yargsParser(args)
+const DEFAULT_INPUT = '**/*.+(js|json|less|css|ts|tsx|md)'
 
-const here = p => path.join(__dirname, p)
-const hereRelative = p => here(p).replace(process.cwd(), '.')
+module.exports = function runPrettier(argv) {
+  const {config, ignorePath, write, input} = argv
 
-const useBuiltinConfig =
-  !args.includes('--config') &&
-  !hasFile('.prettierrc') &&
-  !hasFile('prettier.config.js') &&
-  !hasPkgProp('prettierrc')
-const config = useBuiltinConfig
-  ? ['--config', hereRelative('../config/prettierrc.js')]
-  : []
+  if (!input.length) {
+    input.unshift(DEFAULT_INPUT)
+  }
+  console.log(chalk`Formating {bold.white ${input.join(', ')}} ...`)
 
-const useBuiltinIgnore =
-  !args.includes('--ignore-path') && !hasFile('.prettierignore')
-const ignore = useBuiltinIgnore
-  ? ['--ignore-path', hereRelative('../config/prettierignore')]
-  : []
+  const here = p => path.join(__dirname, p)
+  const hereRelative = p => here(p).replace(process.cwd(), '.')
 
-const write = args.includes('--no-write') ? [] : ['--write']
+  const useBuiltinConfig =
+    typeof config === 'undefined' &&
+    !hasFile('.prettierrc') &&
+    !hasFile('prettier.config.js') &&
+    !hasPkgProp('prettierrc')
 
-// this ensures that when running format as a pre-commit hook and we get
-// the full file path, we make that non-absolute so it is treated as a glob,
-// This way the prettierignore will be applied
-const relativeArgs = args.map(a => a.replace(`${process.cwd()}/`, ''))
+  const configOption = useBuiltinConfig
+    ? ['--config', hereRelative('../config/prettierrc.js')]
+    : config
+      ? ['--config', config]
+      : []
 
-const filesToApply = parsedArgs._.length
-  ? []
-  : ['**/*.+(js|json|less|css|ts|tsx|md)']
+  const useBuiltinIgnore = !ignorePath && !hasFile('.prettierignore')
+  const ignore = useBuiltinIgnore
+    ? ['--ignore-path', hereRelative('../config/prettierignore')]
+    : ignorePath
+      ? ['--ignore-path', ignorePath]
+      : []
 
-const result = spawn.sync(
-  resolveBin('prettier'),
-  [...config, ...ignore, ...write, ...filesToApply].concat(relativeArgs),
-  {stdio: 'inherit'},
-)
+  const writeOption = write ? ['--write'] : []
 
-process.exit(result.status)
+  // this ensures that when running format as a pre-commit hook and we get
+  // the full file path, we make that non-absolute so it is treated as a glob,
+  // This way the prettierignore will be applied
+  const relativeArgs = input.map(a => a.replace(`${process.cwd()}/`, ''))
+
+  const result = spawn.sync(
+    resolveBin('prettier'),
+    [...configOption, ...ignore, ...writeOption, ...relativeArgs],
+    {stdio: 'inherit'},
+  )
+
+  return result
+}

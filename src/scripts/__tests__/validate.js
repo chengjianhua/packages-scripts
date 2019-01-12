@@ -16,7 +16,7 @@ cases(
     try {
       // tests
       crossSpawnSyncMock.mockClear()
-      require('../validate')
+      require('../..')
       expect(crossSpawnSyncMock).toHaveBeenCalledTimes(1)
       const [firstCall] = crossSpawnSyncMock.mock.calls
       const [script, calledArgs] = firstCall
@@ -48,7 +48,7 @@ cases(
       setup: withDefaultSetup(setupWithScripts(['test', 'build', 'lint'])),
     },
     'allows you to specify your own npm scripts': {
-      setup: setupWithArgs(['specialbuild,specialtest,speciallint']),
+      setup: setupWithArgs(['specialbuild', 'specialtest', 'speciallint']),
     },
     [`doesn't use test or lint if it's in precommit`]: {
       setup: withDefaultSetup(() => {
@@ -79,7 +79,7 @@ function setupWithArgs(args = []) {
     const originalResolveBin = utils.resolveBin
     utils.resolveBin = (modName, {executable = modName} = {}) => executable
     const originalArgv = process.argv
-    process.argv = ['node', '../format', ...args]
+    process.argv = ['node', '../..', 'validate', ...args]
     return function teardown() {
       process.argv = originalArgv
       utils.resolveBin = originalResolveBin

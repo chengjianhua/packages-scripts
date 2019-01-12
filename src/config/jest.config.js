@@ -1,9 +1,9 @@
 const path = require('path')
-const {ifAnyDep, hasFile, hasPkgProp, fromRoot} = require('../utils')
+
+const {ifAnyDep, fromRoot} = require('../utils')
+const {defaultSourceRoot} = require('../options')
 
 const here = p => path.join(__dirname, p)
-
-const useBuiltInBabelConfig = !hasFile('.babelrc') && !hasPkgProp('babel')
 
 const ignores = [
   '/node_modules/',
@@ -13,14 +13,17 @@ const ignores = [
 ]
 
 const jestConfig = {
-  roots: [fromRoot('src')],
+  roots: [fromRoot(defaultSourceRoot)],
   testEnvironment: ifAnyDep(['webpack', 'rollup', 'react'], 'jsdom', 'node'),
   testURL: 'http://localhost',
   moduleFileExtensions: ['js', 'jsx', 'json', 'ts', 'tsx'],
-  collectCoverageFrom: ['src/**/*.+(js|jsx|ts|tsx)'],
+  collectCoverageFrom: [`${defaultSourceRoot}/**/*.+(js|jsx|ts|tsx)`],
   testMatch: ['**/__tests__/**/*.+(js|jsx|ts|tsx)'],
   testPathIgnorePatterns: [...ignores],
-  coveragePathIgnorePatterns: [...ignores, 'src/(umd|cjs|esm)-entry.js$'],
+  coveragePathIgnorePatterns: [
+    ...ignores,
+    `${defaultSourceRoot}/(umd|cjs|esm)-entry.js$`,
+  ],
   transformIgnorePatterns: ['[/\\\\]node_modules[/\\\\].+\\.(js|jsx)$'],
   coverageThreshold: {
     global: {
@@ -30,10 +33,9 @@ const jestConfig = {
       statements: 100,
     },
   },
-}
-
-if (useBuiltInBabelConfig) {
-  jestConfig.transform = {'^.+\\.js$': here('./babel-transform')}
+  transform: {
+    '^.+\\.(jsx?|tsx?)$': here('./babel-transform'),
+  },
 }
 
 module.exports = jestConfig

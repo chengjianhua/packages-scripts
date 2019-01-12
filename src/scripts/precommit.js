@@ -8,40 +8,41 @@ const {isOptedIn, resolveBin, appDirectory} = require('../utils')
 const here = p => path.join(__dirname, p)
 const hereRelative = p => here(p).replace(process.cwd(), '.')
 
-const args = process.argv.slice(2)
+module.exports = function precommit({args}) {
+  const lintStagedConfigSearchResult = loadLintStagedConfig()
+  // eslint-disable-next-line no-unused-vars
+  let useBuiltInConfig, configFilePath
 
-const lintStagedConfigSearchResult = loadLintStagedConfig()
-// eslint-disable-next-line no-unused-vars
-let useBuiltInConfig, configFilePath
+  if (lintStagedConfigSearchResult) {
+    configFilePath = lintStagedConfigSearchResult
+      ? lintStagedConfigSearchResult.filepath
+      : (useBuiltInConfig = false)
+  } else {
+    configFilePath = require.resolve('../config/lintstagedrc.js')
+    useBuiltInConfig = true
+  }
 
-if (lintStagedConfigSearchResult) {
-  configFilePath = lintStagedConfigSearchResult
-    ? lintStagedConfigSearchResult.filepath
-    : (useBuiltInConfig = false)
-} else {
-  configFilePath = require.resolve('../config/lintstagedrc.js')
-  useBuiltInConfig = true
-}
+  useBuiltInConfig = useBuiltInConfig && !args.includes('--config')
+  // lintStaged(console, configFilePath)
 
-useBuiltInConfig = useBuiltInConfig && !args.includes('--config')
-// lintStaged(console, configFilePath)
+  if (useBuiltInConfig) {
+    args.push('--config', hereRelative('../config/lintstagedrc.js'))
+  }
 
-if (useBuiltInConfig) {
-  args.push('--config', hereRelative('../config/lintstagedrc.js'))
-}
-
-const lintStagedResult = spawn.sync(resolveBin('lint-staged'), args, {
-  stdio: 'inherit',
-})
-
-if (lintStagedResult.status !== 0 || !isOptedIn('pre-commit')) {
-  process.exit(lintStagedResult.status)
-} else {
-  const validateResult = spawn.sync('npm', ['run', 'validate'], {
+  const lintStagedResult = spawn.sync(resolveBin('lint-staged'), args, {
     stdio: 'inherit',
   })
 
-  process.exit(validateResult.status)
+  if (lintStagedResult.status !== 0 || !isOptedIn('pre-commit')) {
+    process.exit(lintStagedResult.status)
+    return lintStagedResult
+  } else {
+    const validateResult = spawn.sync('npm', ['run', 'validate'], {
+      stdio: 'inherit',
+    })
+
+    return validateResult
+  }
 }
 
 /**
